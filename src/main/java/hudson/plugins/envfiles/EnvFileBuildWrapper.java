@@ -28,7 +28,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * BuildWrapper to set environment variables from files.
  * 
  * @author Original by Anders Johansson Modified by Tuyen Lieu
- * 
  *
  */
 public class EnvFileBuildWrapper extends BuildWrapper
@@ -179,10 +178,9 @@ public class EnvFileBuildWrapper extends BuildWrapper
 
         /**
          * Return Environment Map will contains our loaded env variables.
-         * 
          * @param currentMap
-         * @return New Map with our loaded env variables or return current map
-         *         in case we can't load our env variables
+         * @return New Map with our loaded env variables 
+         *         or return current map in case we can't load our env variables
          */
         private Map<String, String> getEnvFileMap(Map<String, String> currentMap)
         {
@@ -203,8 +201,7 @@ public class EnvFileBuildWrapper extends BuildWrapper
             {
                 console("IO error");
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 console("An error has occured : " + e.getMessage());
             }
             return currentMap;
