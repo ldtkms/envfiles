@@ -7,14 +7,20 @@ import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Hudson;
+import hudson.model.ItemGroup;
+import hudson.model.Job;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrapperDescriptor;
-
+import jenkins.model.Jenkins;
+import hudson.model.Job;
+import hudson.model.Items;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +43,8 @@ public class EnvFileBuildWrapper extends BuildWrapper
     private static final String NAME = "[envfile] ";
     private static final String DEFAULT_PATH = "$WORKSPACE";
     private String directoryPath;
-
+    private String projects;
+    public static Map<String, String> envMap = new HashMap<String, String>();
     @DataBoundConstructor
     public EnvFileBuildWrapper(String directoryPath)
     {
@@ -69,10 +76,10 @@ public class EnvFileBuildWrapper extends BuildWrapper
     public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener)
             throws IOException, InterruptedException
     {
-
+        
         logger.fine("Reading environment variables from directry. ");
-
         return new EnvironmentImpl(listener);
+        
     }
 
     class EnvironmentImpl extends Environment
@@ -84,6 +91,7 @@ public class EnvFileBuildWrapper extends BuildWrapper
         {
 
             this.listener = listener;
+
         }
 
         /**
@@ -118,6 +126,14 @@ public class EnvFileBuildWrapper extends BuildWrapper
             return directory.listFiles(filter);
         }
 
+        /**
+         * Add user environment variables to current env map
+         * 
+         * @param tmpFileEnvMap
+         * @param currentMap
+         * @throws FileNotFoundException
+         * @throws IOException
+         */
         private void processEnvFileMap(Map<String, String> tmpFileEnvMap, Map<String, String> currentMap)
                 throws FileNotFoundException, IOException
         {
@@ -178,9 +194,10 @@ public class EnvFileBuildWrapper extends BuildWrapper
 
         /**
          * Return Environment Map will contains our loaded env variables.
+         * 
          * @param currentMap
-         * @return New Map with our loaded env variables 
-         *         or return current map in case we can't load our env variables
+         * @return New Map with our loaded env variables or return current map
+         *         in case we can't load our env variables
          */
         private Map<String, String> getEnvFileMap(Map<String, String> currentMap)
         {
@@ -201,7 +218,8 @@ public class EnvFileBuildWrapper extends BuildWrapper
             {
                 console("IO error");
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 console("An error has occured : " + e.getMessage());
             }
             return currentMap;
@@ -217,6 +235,7 @@ public class EnvFileBuildWrapper extends BuildWrapper
         public void buildEnvVars(Map<String, String> env)
         {
             env.putAll(getEnvFileMap(env));
+            envMap.putAll(env);
         }
     }
 
